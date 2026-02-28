@@ -64,6 +64,8 @@ services:
       - .env.dev
     environment:
       - VITE_API_URL=http://localhost:${BACKEND_PORT:-8000}
+      - CHOKIDAR_USEPOLLING=true
+      - CHOKIDAR_INTERVAL=1000 
     command: npm run dev -- --host 0.0.0.0
 
 volumes:
