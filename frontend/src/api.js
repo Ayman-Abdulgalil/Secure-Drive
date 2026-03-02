@@ -1,5 +1,5 @@
 // src/api.js
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = 'http://localhost:8000/api/v1';
 
 export const api = {
   // Get all files
@@ -13,7 +13,7 @@ export const api = {
     if (params.limit) queryParams.append('limit', params.limit);
     if (params.offset) queryParams.append('offset', params.offset);
 
-    const url = `${API_BASE_URL}/objects?${queryParams}`;
+    const url = `${API_BASE_URL}/files?${queryParams}`;
     const response = await fetch(url);
     
     if (!response.ok) {
@@ -25,7 +25,7 @@ export const api = {
 
   // Get storage stats
   async getStorageStats() {
-    const response = await fetch(`${API_BASE_URL}/objects/stats`);
+    const response = await fetch(`${API_BASE_URL}/files/stats`);
     
     if (!response.ok) {
       throw new Error('Failed to fetch storage stats');
@@ -41,7 +41,7 @@ export const api = {
     if (folder) formData.append('folder', folder);
     if (logicalName) formData.append('logical_name', logicalName);
 
-    const response = await fetch(`${API_BASE_URL}/objects`, {
+    const response = await fetch(`${API_BASE_URL}/files`, {
       method: 'POST',
       body: formData,
     });
@@ -54,8 +54,8 @@ export const api = {
   },
 
   // Delete file
-  async deleteFile(objectId) {
-    const response = await fetch(`${API_BASE_URL}/objects/${objectId}`, {
+  async deleteFile(fileId) {
+    const response = await fetch(`${API_BASE_URL}/files/${fileId}`, {
       method: 'DELETE',
     });
 
@@ -67,7 +67,7 @@ export const api = {
   },
 
   // Download file URL
-  getDownloadUrl(objectId) {
-    return `${API_BASE_URL}/objects/${objectId}`;
+  getDownloadUrl(fileId) {
+    return `${API_BASE_URL}/files/${fileId}`;
   },
 };

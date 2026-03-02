@@ -1,6 +1,4 @@
-sqlalchemy
-psycopg
-psycopg_binary
+asyncpg
 
 minio
 
@@ -8,5 +6,8 @@ fastapi
 pyjwt
 passlib[bcrypt]
 pydantic[email]
+itsdangerous
+aiosmtplib
 python-multipart
 uvicorn[standard]
+bcrypt==4.0.1

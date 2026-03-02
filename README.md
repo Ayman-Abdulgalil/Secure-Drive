@@ -9,12 +9,12 @@ Currently in a very early **design** phase.
 
 ## Overview
 
-Secure Drive combines a FastAPI backend, MinIO object storage, and PostgreSQL for metadata/auth. The frontend uses Vite + React during development and is served as static assets in production.
+Secure Drive combines a FastAPI backend, MinIO file storage, and PostgreSQL for metadata/auth. The frontend uses Vite + React during development and is served as static assets in production.
 
 ## Services
 
 - FastAPI (Python)
-- MinIO (S3-compatible object storage)
+- MinIO (S3-compatible file storage)
 - PostgreSQL (metadata + auth)
 - Frontend (Vite/React in dev, static in prod)
 
@@ -38,7 +38,7 @@ This project aims to explore “high-security by default” cloud storage concep
 - Zero-knowledge storage (server cannot read user content)
 - Envelope encryption (per-file keys, wrapped by master/user keys)
 - Strong authentication (MFA-ready), secure session handling, and least-privilege access control
-- Robust authorization (RBAC/ABAC), object-level permissions, and audited access
+- Robust authorization (RBAC/ABAC), file-level permissions, and audited access
 - Key management strategy (rotation, revocation, backup/recovery), ideally HSM/KMS-compatible
 - Secure sharing (time-bound links, scoped tokens, re-encryption on share, access revocation)
 - Integrity protections (hashing, signatures, tamper-evident logs)

@@ -40,7 +40,7 @@ export default function Dashboard() {
             
             // Convert backend format to UI format
             const formattedFiles = data.items.map(item => ({
-                id: item.object_id,
+                id: item.file_id,
                 name: item.name,
                 type: item.folder ? 'Folder' : getFileType(item.name),
                 size: item.folder ? '—' : formatBytes(item.size_bytes),
