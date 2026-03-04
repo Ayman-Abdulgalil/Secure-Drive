@@ -30,7 +30,7 @@ function ForgotPassword() {
 
         try {
             // TODO: Replace with actual API call when backend is ready
-            const response = await fetch("http://localhost:8000/api/auth/forgot-password", {
+            const response = await fetch("http://localhost:8000/api/v1/auth/forgot-password", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
