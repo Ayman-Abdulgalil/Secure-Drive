@@ -1,12 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, status
 import asyncpg
-from fastapi.responses import RedirectResponse
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import HTMLResponse
 
-from .email_verification import (
-    send_email,
-    create_token,
-    validate_token,
-)
+from ...models.token import LoginResponse
 from ...repositories.database import db
 from ...repositories.users import (
     create_user,
@@ -14,16 +10,21 @@ from ...repositories.users import (
     get_user_by_email,
     record_login,
 )
+from .email_verification import (
+    send_email,
+    create_token,
+    validate_token,
+)
 from ...models.user import (
     UserRegister,
     UserLogin,
     UserResponse,
 )
-from ...models.token import LoginResponse, LoginResponse
 from .utils import (
     hash_password,
     verify_password,
     create_access_token,
+    get_current_user
     # create_refresh_token,
 )
 
@@ -80,9 +81,7 @@ async def register(user_data: UserRegister, conn: asyncpg.Connection = Depends(d
 
 
 @router.post("/resend-verification", status_code=status.HTTP_200_OK)
-async def resend_verification(
-    email: str, conn: asyncpg.Connection = Depends(db)
-):
+async def resend_verification(email: str, conn: asyncpg.Connection = Depends(db)):
     # Find user by email
     user: asyncpg.Record = await get_user_by_email(conn=conn, email=email)
 
@@ -103,7 +102,7 @@ async def resend_verification(
         )
 
 
-@router.get("/verify/{signed_token}")
+@router.get("/verify/{signed_token}", status_code=status.HTTP_200_OK)
 async def verify_email(
     signed_token: str,
     conn: asyncpg.Connection = Depends(db),
@@ -114,7 +113,7 @@ async def verify_email(
         user_id=verification_result.user_id,
     )
 
-    return RedirectResponse(url="/login", status_code=status.HTTP_301_MOVED_PERMANENTLY)
+    return HTMLResponse(content='<script>window.location.href="/login"</script>')
 
 
 @router.post("/login", response_model=LoginResponse, status_code=status.HTTP_200_OK)
@@ -237,9 +236,9 @@ async def login(credentials: UserLogin, conn: asyncpg.Connection = Depends(db)):
 #     return None
 
 
-# @router.get("/me", response_model=UserResponse)
-# async def get_current_user_info(current_user: CurrentUser):
-#     """
-#     Get current authenticated user information.
-#     """
-#     return current_user
+@router.get("/me", response_model=UserResponse, status_code=status.HTTP_200_OK)
+async def get_current_user_info(current_user: UserResponse = Depends(get_current_user)):
+    """
+    Get current authenticated user information.
+    """
+    return current_user

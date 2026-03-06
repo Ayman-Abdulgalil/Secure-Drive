@@ -129,7 +129,8 @@ def _load_config() -> _EmailConfig:
         raise MailerError(f"Error loading email body template: {exc}") from exc
 
     return _EmailConfig(
-        BASE_URL=os.getenv("BASE_URL", ""),
+        # BASE_URL=os.getenv("BASE_URL", ""),
+        BASE_URL="http://localhost:8000",
         SMTP_HOST=os.getenv("SMTP_HOST", ""),
         SMTP_PORT=_parse_smtp_port(),
         SMTP_USERNAME=os.getenv("SMTP_USERNAME", ""),

@@ -1,11 +1,20 @@
 import os
-import jwt
+import asyncpg
+from fastapi.security import OAuth2PasswordBearer
+import jwt, jwt.exceptions as JWTError
 from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
+from fastapi import Depends, HTTPException, status
+
+from ...models.user import UserResponse
+from ...repositories.database import db
+from ...repositories.users import get_user_by_id
 
 # Configuration
 _SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "")
 _ALGORITHM = os.environ.get("JWT_ALGORITHM", "HS256")
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 # Password hashing
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -47,3 +56,36 @@ def decode_token(token: str) -> dict | None:
         return None
     except jwt.InvalidTokenError:
         return None
+
+
+async def get_current_user(
+    token: str = Depends(oauth2_scheme), conn: asyncpg.Connection = Depends(db)
+) -> UserResponse:
+
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+    try:
+        payload = jwt.decode(token, _SECRET_KEY, algorithms=[_ALGORITHM])
+        uuid: str = payload.get("sub")
+        if uuid is None:
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
+
+    user = await get_user_by_id(conn=conn, user_id=uuid)
+    if user is None:
+        raise credentials_exception
+    
+    user_response = UserResponse(
+        name=str(user["name"]),
+        email=user["email"],
+        created_at=user["created_at"],
+        storage_quota=user["storage_quota"],
+        storage_used=user["storage_used"],
+    )
+
+    return user_response
