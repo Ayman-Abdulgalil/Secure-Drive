@@ -1,11 +1,31 @@
 // src/api.js
+import { getToken, clearToken } from "./tokenStore";
 const API_BASE_URL = 'http://localhost:8000/api/v1';
 
+function authHeaders(extraHeaders = {}) {
+  const token = getToken();
+  return {
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...extraHeaders,
+  };
+}
+
+async function handleResponse(response) {
+  if (response.status === 401) {
+    clearToken();
+    window.location.href = "/login";
+    throw new Error("Session expired. Please log in again.");
+  }
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.detail || `Request failed (${response.status})`);
+  }
+  return response.json();
+}
+
 export const api = {
-  // Get all files
   async getFiles(params = {}) {
     const queryParams = new URLSearchParams();
-    
     if (params.folder !== undefined) queryParams.append('folder', params.folder);
     if (params.search) queryParams.append('search', params.search);
     if (params.sort_by) queryParams.append('sort_by', params.sort_by);
@@ -14,27 +34,15 @@ export const api = {
     if (params.offset) queryParams.append('offset', params.offset);
 
     const url = `${API_BASE_URL}/files?${queryParams}`;
-    const response = await fetch(url);
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch files');
-    }
-    
-    return await response.json();
+    const response = await fetch(url, { headers: authHeaders() });
+    return handleResponse(response);
   },
 
-  // Get storage stats
   async getStorageStats() {
-    const response = await fetch(`${API_BASE_URL}/files/stats`);
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch storage stats');
-    }
-    
-    return await response.json();
+    const response = await fetch(`${API_BASE_URL}/files/stats`, { headers: authHeaders() });
+    return handleResponse(response);
   },
 
-  // Upload file
   async uploadFile(file, folder = null, logicalName = null) {
     const formData = new FormData();
     formData.append('file', file);
@@ -43,30 +51,20 @@ export const api = {
 
     const response = await fetch(`${API_BASE_URL}/files`, {
       method: 'POST',
+      headers: authHeaders(),
       body: formData,
     });
-
-    if (!response.ok) {
-      throw new Error('Failed to upload file');
-    }
-
-    return await response.json();
+    return handleResponse(response);
   },
 
-  // Delete file
   async deleteFile(fileId) {
     const response = await fetch(`${API_BASE_URL}/files/${fileId}`, {
       method: 'DELETE',
+      headers: authHeaders(),
     });
-
-    if (!response.ok) {
-      throw new Error('Failed to delete file');
-    }
-
-    return await response.json();
+    return handleResponse(response);
   },
 
-  // Download file URL
   getDownloadUrl(fileId) {
     return `${API_BASE_URL}/files/${fileId}`;
   },

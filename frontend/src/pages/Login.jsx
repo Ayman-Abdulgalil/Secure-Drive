@@ -3,6 +3,7 @@ import { Box, Card, TextField, Button, Typography, Alert, InputAdornment, IconBu
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import Logo from "../assets/logo.svg";
+import { setToken } from "../tokenStore";
 
 function Login() {
     const navigate = useNavigate();
@@ -47,9 +48,7 @@ function Login() {
             const data = await response.json();
 
             if (response.ok) {
-                // Save tokens to localStorage
-                localStorage.setItem("access_token", data.access_token);
-                localStorage.setItem("refresh_token", data.refresh_token);
+                setToken(data.access_token);
                 
                 // Redirect to dashboard
                 navigate("/dashboard");

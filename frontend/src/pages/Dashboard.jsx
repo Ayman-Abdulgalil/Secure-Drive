@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Logo from "../assets/logo.svg";
 import { Upload, Folder, FileText, Settings, Search, MoreVertical, Home, Clock, Star, Trash2, Users, HardDrive, Download, Share2 } from 'lucide-react';
 import { api } from '../api';
+import { getToken } from "../tokenStore";
 
 export default function Dashboard() {
     const navigate = useNavigate();
@@ -17,7 +18,7 @@ export default function Dashboard() {
     // Fetch user data when component loads
     useEffect(() => {
         const fetchUserData = async () => {
-            const token = localStorage.getItem("access_token");
+            const token = getToken();
             
             // If no token, redirect to login
             if (!token) {
@@ -37,8 +38,6 @@ export default function Dashboard() {
                     setUser(data);
                 } else {
                     // Token invalid, redirect to login
-                    localStorage.removeItem("access_token");
-                    localStorage.removeItem("refresh_token");
                     navigate("/login");
                 }
             } catch (error) {
