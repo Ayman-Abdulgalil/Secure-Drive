@@ -1,26 +1,76 @@
 version: 2
 updates:
   - package-ecosystem: "pip"
-    directory: "/backend" # path to your requirements.txt
+    directory: "/backend"
     schedule:
       interval: "weekly"
+    labels:
+      - "dependencies"
+      - "python"
+      - "automated"
+    commit-message:
+      prefix: "chore(pip)"
+    groups:
+      python-deps:
+        patterns:
+          - "*"
 
   - package-ecosystem: "npm"
-    directory: "/frontend" # path to your package.json
+    directory: "/frontend"
     schedule:
       interval: "weekly"
+    labels:
+      - "dependencies"
+      - "javascript"
+      - "automated"
+    commit-message:
+      prefix: "chore(npm)"
+    groups:
+      npm-deps:
+        patterns:
+          - "*"
 
   - package-ecosystem: "docker"
-    directory: "/" # path to docker-compose files
+    directory: "/"
     schedule:
       interval: "weekly"
+    labels:
+      - "dependencies"
+      - "docker"
+      - "automated"
+    commit-message:
+      prefix: "chore(docker)"
+    groups:
+      docker-deps:
+        patterns:
+          - "*"
 
   - package-ecosystem: "docker"
-    directory: "/backend" # path to Dockerfiles
+    directory: "/backend"
     schedule:
       interval: "weekly"
+    labels:
+      - "dependencies"
+      - "docker"
+      - "automated"
+    commit-message:
+      prefix: "chore(docker-backend)"
+    groups:
+      docker-backend-deps:
+        patterns:
+          - "*"
 
   - package-ecosystem: "docker"
-    directory: "/frontend" # path to Dockerfiles
+    directory: "/frontend"
     schedule:
       interval: "weekly"
+    labels:
+      - "dependencies"
+      - "docker"
+      - "automated"
+    commit-message:
+      prefix: "chore(docker-frontend)"
+    groups:
+      docker-frontend-deps:
+        patterns:
+          - "*"
